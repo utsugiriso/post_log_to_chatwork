@@ -38,7 +38,7 @@ FileWatcher.new([params[LOG]]).watch do |filename, event|
       line_number = file.lineno
       if body.length != 0
         body.chop!
-        body = "#{to_ids.split(',').map{|to_id| "[TO:#{to_id}]"}.join}\n#{body}" if is_to
+        body = "#{params[TO_IDS].split(',').map{|to_id| "[TO:#{to_id}]"}.join}\n#{body}" if is_to
         ChatWork::Message.create(room_id: params[ROOM_ID], body: body)
       end
     end
