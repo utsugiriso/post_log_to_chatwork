@@ -30,7 +30,7 @@ FileWatcher.new([params[LOG]]).watch do |filename, event|
       is_to = false
       body = ''
       file.each_line do |line|
-        if line_number < index && !line.match(Regexp.new(exclude))
+        if line_number < index && !line.match(Regexp.new(params[EXCLUDE]))
           body += "#{line}\n"
           is_to = true if !params[TO_PATTERN].nil? && line.include?(params[TO_PATTERN])
         end
