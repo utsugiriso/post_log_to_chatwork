@@ -7,8 +7,9 @@ ROOM_ID = 'room_id'
 TO_IDS = 'to_ids'
 LOG = 'log'
 TO_PATTERN = 'to_pattern'
+EXCLUDE = 'exclude'
 
-params = ARGV.getopts('c:', "#{API_KEY}:", "#{ROOM_ID}:", "#{TO_IDS}:", "#{LOG}:", "#{TO_PATTERN}:")
+params = ARGV.getopts('c:', "#{API_KEY}:", "#{ROOM_ID}:", "#{TO_IDS}:", "#{LOG}:", "#{TO_PATTERN}:", "#{EXCLUDE}:")
 p params
 
 ChatWork.api_key = params[API_KEY]
@@ -29,7 +30,7 @@ FileWatcher.new([params[LOG]]).watch do |filename, event|
       is_to = false
       body = ''
       file.each_line do |line|
-        if line_number < index
+        if line_number < index && !line.match(Regexp.new(exclude))
           body += "#{line}\n"
           is_to = true if !params[TO_PATTERN].nil? && line.include?(params[TO_PATTERN])
         end
