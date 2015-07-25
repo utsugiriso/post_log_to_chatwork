@@ -14,27 +14,23 @@ p params
 
 ChatWork.api_key = params[API_KEY]
 
-LINE_NUMBER_ORIGIN = -1
+LINE_NUMBER_ORIGIN = 0
 line_number = LINE_NUMBER_ORIGIN
 if File.exist?(params[LOG])
-  File.open(params[LOG]) do |file|
-    line_number = file.lineno
-  end
+  line_number = File.read(params[LOG]).count("\n")
 end
 
 FileWatcher.new([params[LOG]]).watch do |filename, event|
   if event != :delete && File.exist?(filename)
     File.open(filename) do |file|
-      line_number = LINE_NUMBER_ORIGIN if file.lineno < line_number
-      index = 0
+      line_number = LINE_NUMBER_ORIGIN if File.read(params[LOG]).count("\n") < line_number
       is_to = false
       body = ''
       file.each_line do |line|
-        if line_number < index && !line.match(Regexp.new(params[EXCLUDE]))
+        if line_number < file.lineno && !line.match(Regexp.new(params[EXCLUDE]))
           body += "#{line}\n"
-          is_to = true if !params[TO_PATTERN].nil? && line.include?(params[TO_PATTERN])
+          is_to = true if !params[TO_PATTERN].nil? && !!line.match(params[TO_PATTERN])
         end
-        index += 1
       end
       line_number = file.lineno
       if body.length != 0
